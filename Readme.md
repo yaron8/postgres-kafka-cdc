@@ -61,6 +61,20 @@ select * from users;
 
 The `init.sql` file initializes the PostgreSQL database with a `users` table. This file is automatically executed when the PostgreSQL container starts, creating the table structure required for capturing data changes.
 
+## Enable Topic Compaction
+
+Please be aware that compaction may not good for db synchronization.
+
+To enalble compaction on `postgres-users-cdc` topic:
+
+```bash
+docker exec kafka kafka-configs --bootstrap-server kafka:29092 \
+    --entity-type topics \
+    --entity-name postgres-users-cdc \
+    --alter \
+    --add-config cleanup.policy=compact,segment.ms=1000,min.cleanable.dirty.ratio=0.001,delete.retention.ms=1000
+```
+
 ## Modifying Configurations
 
 - **PostgreSQL CDC Settings**: The `docker-compose.yml` configures PostgreSQL with `wal_level=logical` to enable CDC through logical replication.
